@@ -23,9 +23,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="bn">
+    <html lang="bn"
+      data-theme="light"
+      data-scroll-behavior="smooth"
+      >
       <body
-        className={`${notoSansBengali.className} flex min-h-screen flex-col bg-green-50/50 antialiased`}
+        className={`${notoSansBengali.className} flex min-h-screen flex-col bg-slate-100 antialiased`}
       >
         <Navbar/>
         <PriceTicker/>

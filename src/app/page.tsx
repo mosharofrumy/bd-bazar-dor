@@ -1,94 +1,88 @@
 
+import HeroBanner from "@/components/HeroBanner";
 import { getProducts } from "@/lib/bazardor-api";
+import ProductCard from "@/components/ProductCard";
 
-const formatPrice = (price: number) =>
-  new Intl.NumberFormat("bn-BD").format(price);
-
-const formatUnit = (unit: string) => {
-  const units: Record<string, string> = {
-    kg: "কেজি",
-    litre: "লিটার",
-    dozen: "ডজন",
-    piece: "টি",
-  };
-
-  return units[unit] ?? unit;
-};
+const formatNumber = (value: number) =>
+  new Intl.NumberFormat("bn-BD").format(value);
 
 export default async function Home() {
   const products = await getProducts();
 
+  const increasingProducts = products
+    .filter((product) => product.change.dir === "up")
+    .slice(0, 6);
+
+  const decreasingProducts = products
+    .filter((product) => product.change.dir === "down")
+    .slice(0, 6);
+
   return (
-    <main className="mx-auto w-full max-w-6xl p-4 sm:p-6">
-      <h1 className="mb-2 text-2xl font-bold text-green-800">
-        আজকের বাজার-দর
-      </h1>
+    <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
+      <HeroBanner />
 
-      <p className="mb-6 text-sm text-gray-600">
-        নিত্যপ্রয়োজনীয় পণ্যের দাম এক নজরে দেখুন।
-      </p>
-
-      <h2 className="mb-4 text-xl font-semibold">
-        সকল পণ্য ({formatPrice(products.length)})
-      </h2>
-
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {products.slice(0, 6).map((product) => (
-          <article
-            key={product.id}
-            className="card border border-green-100 bg-base-100 shadow-sm"
-          >
-            <div className="card-body gap-2 p-4">
-              <div className="flex items-center gap-3">
-                <span className="text-3xl" aria-hidden="true">
-                  {product.image || product.categoryIcon}
-                </span>
-
-                <div>
-                  <h3 className="font-bold">
-                    {product.nameBn}
-                  </h3>
-
-                  <p className="text-sm text-gray-500">
-                    প্রতি {formatUnit(product.unit)}
-                  </p>
-                </div>
-              </div>
-
-              <p className="text-2xl font-bold text-green-700">
-                ৳{formatPrice(product.today)}
-              </p>
-
-              <p className="text-sm text-gray-500">
-                গতকাল: ৳{formatPrice(product.yesterday)}
-              </p>
-
-              <div className="flex items-center justify-between border-t border-base-200 pt-3">
-                <span className="text-sm text-gray-600">
-                  মূল্য পরিবর্তন
-                </span>
-
-                <span
-                  className={`badge ${
-                    product.change.dir === "up"
-                      ? "badge-error"
-                      : product.change.dir === "down"
-                        ? "badge-success"
-                        : "badge-ghost"
-                  }`}
-                >
-                  {product.change.dir === "up"
-                    ? "▲"
-                    : product.change.dir === "down"
-                      ? "▼"
-                      : "—"}{" "}
-                  {formatPrice(Math.abs(product.change.pct))}%
-                </span>
-              </div>
+      {/* Today's price increases */}
+      {increasingProducts.length > 0 && (
+        <section className="mb-10">
+          <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 sm:text-2xl">
+                <span className="mr-2 text-red-600">▲</span>
+                আজ যেসব পণ্যের দাম বেড়েছে
+              </h2>
             </div>
-          </article>
-        ))}
-      </div>
-    </main>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {increasingProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Today's price decreases */}
+      {decreasingProducts.length > 0 && (
+        <section className="mb-10">
+          <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 sm:text-2xl">
+                <span className="mr-2 text-green-600">▼</span>
+                আজ যেসব পণ্যের দাম কমেছে
+              </h2>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {decreasingProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* All products */}
+      <section id="all-products" className="scroll-mt-40">
+        <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
+          <div>
+            <h2 className="text-xl font-bold text-gray-900 sm:text-2xl">
+              সকল পণ্য
+            </h2>
+
+            <p className="mt-1 text-sm text-gray-500">
+              নিত্যপ্রয়োজনীয় {formatNumber(products.length)} টি পণ্যের তালিকা দেখানো হচ্ছে
+            </p>
+          </div>
+
+  
+        </div>
+
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {products.map((product) => (
+            <ProductCard key={product.id} product={product} />
+          ))}
+        </div>
+      </section>
+    </div>
   );
 }

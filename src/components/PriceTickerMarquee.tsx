@@ -1,8 +1,8 @@
-
 "use client";
 
 import Marquee from "react-fast-marquee";
 import type { Product } from "@/types/product";
+import ProductIcon from "./ProductIcon";
 
 type Props = {
   products: Product[];
@@ -19,24 +19,22 @@ const formatUnit = (unit: string) => {
     litre: "লিটার",
     liter: "লিটার",
     dozen: "ডজন",
-    piece: "টি",
+    piece: "পিস",
   };
 
   return units[unit.toLowerCase()] ?? unit;
 };
 
-export default function PriceTickerMarquee({
-  products,
-}: Props) {
+export default function PriceTickerMarquee({ products }: Props) {
   if (products.length === 0) return null;
 
   return (
     <section
       aria-label="পণ্যের চলমান মূল্য তালিকা"
-      className="w-full overflow-hidden border-b border-green-200 bg-green-50"
+      className="w-full overflow-hidden border-b border-green-200 bg-white"
     >
       <Marquee
-        speed={100}
+        speed={150}
         pauseOnHover
         gradient
         gradientColor="#f0fdf4"
@@ -49,13 +47,21 @@ export default function PriceTickerMarquee({
           return (
             <div
               key={product.id}
-              className="mx-5 flex shrink-0 items-center gap-2 py-3 text-sm sm:mx-7"
+              className="mx-5 flex shrink-0 border-l border-gray-300/50 pl-2 items-center gap-1 py-1.5 text-sm sm:mx-7"
             >
-              <span className="font-semibold text-gray-800">
-                {product.categoryIcon} {product.nameBn}
-              </span>
+              <div className="flex items-center gap-2">
+                <ProductIcon
+                  image={product.image}
+                  name={product.nameBn}
+                  className="size-8! rounded-lg! text-xl!"
+                />
 
-              <span className="font-bold text-green-800">
+                <span className="font-semibold text-gray-800">
+                  {product.nameBn}
+                </span>
+              </div>
+
+              <span className="font-bold text-gray-800">
                 ৳{formatPrice(product.today)}
                 <span className="ml-1 text-xs font-normal text-gray-500">
                   /{formatUnit(product.unit)}
@@ -71,8 +77,8 @@ export default function PriceTickerMarquee({
                 {formatPrice(Math.abs(product.change.pct))}%
               </span>
 
-              <span className="text-green-300" aria-hidden="true">
-                ◆
+              <span className=" text-base-300" aria-hidden="true">
+                |
               </span>
             </div>
           );
